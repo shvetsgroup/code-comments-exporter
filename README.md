@@ -25,6 +25,12 @@ Comments exporter is installed as a global Composer package. You need to have Co
 composer global require shvetsgroup/comments-exporter
 ```
 
+**Updates**
+
+```
+composer global update shvetsgroup/comments-exporter
+```
+
 ## Usage
 
 1. Export comments:
