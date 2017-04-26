@@ -1,28 +1,34 @@
 {
-    "name": "shvetsgroup/comments-exporter",
-    "description": "A console script that exports source code comments to csv files and vise versa. Supports most types of comments, both single and multi-line.",
-    "keywords": ["framework", "laravel"],
-    "license": "MIT",
-    "type": "project",
-    "require": {
-        "symfony/console": "^3.2",
-        "symfony/finder": "^3.2",
-        "league/csv": "^8.2"
-    },
-    "autoload": {
-        "psr-4": {
-            "ShvetsGroup\\": "src/ShvetsGroup"
-        }
-    },
-    "autoload-dev": {
-        "psr-4": {
-            "Tests\\": "tests/"
-        }
-    },
-    "config": {
-        "preferred-install": "dist"
-    },
-    "require-dev": {
-        "phpunit/phpunit": "^6.1"
+  "name": "shvetsgroup/comments-exporter",
+  "description": "A console script that exports source code comments to csv files and vise versa. Supports most types of comments, both single and multi-line.",
+  "keywords": [
+    "comments",
+    "export"
+  ],
+  "license": "MIT",
+  "type": "project",
+  "bin": [
+    "comments-exporter"
+  ],
+  "require": {
+    "symfony/console": "^3.2",
+    "symfony/finder": "^3.2",
+    "league/csv": "^8.2"
+  },
+  "autoload": {
+    "psr-4": {
+      "ShvetsGroup\\": "src/ShvetsGroup"
     }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "Tests\\": "tests/"
+    }
+  },
+  "config": {
+    "preferred-install": "dist"
+  },
+  "require-dev": {
+    "phpunit/phpunit": "^6.1"
+  }
 }
