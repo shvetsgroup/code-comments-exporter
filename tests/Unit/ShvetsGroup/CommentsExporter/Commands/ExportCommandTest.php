@@ -1,7 +1,7 @@
 <?php namespace Tests\Unit\ShvetsGroup\CommentsExporter\Commands;
 
-use Tests\TestCase;
 use ShvetsGroup\CommentsExporter\Commands\ExportCommand;
+use Tests\TestCase;
 
 class ExportCommandTest extends TestCase
 {
@@ -22,7 +22,7 @@ class ExportCommandTest extends TestCase
     {
         $this->assertEquals(count($expected), count($actual), "File count is wrong.");
         $i = 0;
-        uasort($actual, function($a, $b){ return $a->getRealPath() > $b->getRealPath(); });
+        uasort($actual, function ($a, $b) { return $a->getRealPath() > $b->getRealPath(); });
         sort($expected);
         foreach ($actual as $file) {
             $this->assertEquals($basePath . $expected[$i], $file->getRealPath(), "{$i}th file has wrong path.");

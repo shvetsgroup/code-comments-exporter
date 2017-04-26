@@ -1,9 +1,9 @@
 <?php namespace Tests\Unit\ShvetsGroup\CommentsExporter\Parsers;
 
 use ShvetsGroup\CommentsExporter\Comment;
-use Tests\TestCase;
-use ShvetsGroup\CommentsExporter\Parsers\Parser;
 use ShvetsGroup\CommentsExporter\Parsers\BaseParser;
+use ShvetsGroup\CommentsExporter\Parsers\Parser;
+use Tests\TestCase;
 
 class BaseParserTest extends TestCase
 {
@@ -123,7 +123,8 @@ SOURCE;
         }
     }
 
-    public function testUpdateComplex() {
+    public function testUpdateComplex()
+    {
         $tokenized = <<<SOURCE
 // ###0###
 class Test {
