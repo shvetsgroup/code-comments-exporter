@@ -12,9 +12,9 @@ use ShvetsGroup\CommentsExporter\SourceFactory;
  * Imports comments from csv file and into source code.
  *
  * Usage examples:
- * - ./comment import test.csv file.php
- * - ./comment import test.csv a-whole-directory
- * - ./comment import test.csv a-whole-directory -w 120
+ * - ./comments-exporter import test.csv file.php
+ * - ./comments-exporter import test.csv a-whole-directory
+ * - ./comments-exporter import test.csv a-whole-directory -w 120
  */
 class ImportCommand extends Command
 {

@@ -29,7 +29,7 @@ composer global require shvetsgroup/comments-exporter
 
 1. Export comments:
     ```
-    ./comments-exporter export /path/to/project /path/to/csv-file.csv
+    comments-exporter export /path/to/project /path/to/csv-file.csv
     ```
 
 2. Do something with the `csv-file.csv` contents. Do not add new rows, just edit the `comment` column.
@@ -37,8 +37,8 @@ composer global require shvetsgroup/comments-exporter
 3. Import comments back:
 
     ```
-    ./comments-exporter import /path/to/csv-file.csv /path/to/project 
+    comments-exporter import /path/to/csv-file.csv /path/to/project 
     ```
 
-Type `./comments-exporter --help` to read about full list of supported parameters.
+Type `comments-exporter --help` to read about full list of supported parameters.
 

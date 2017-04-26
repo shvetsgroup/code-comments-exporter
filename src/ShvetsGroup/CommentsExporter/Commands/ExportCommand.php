@@ -14,9 +14,9 @@ use Symfony\Component\Finder\SplFileInfo;
  * Exports comments from source code to a csv file.
  *
  * Usage examples:
- * - ./comment export file.php test.csv
- * - ./comment export a-whole-directory test.csv
- * - ./comment export a-whole-directory test.csv -i /ignored-dir/ -e php,html -w
+ * - comments-exporter export file.php test.csv
+ * - comments-exporter export a-whole-directory test.csv
+ * - comments-exporter export a-whole-directory test.csv -i /ignored-dir/ -e php,html -w
  */
 class ExportCommand extends Command
 {
