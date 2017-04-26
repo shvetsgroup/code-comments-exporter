@@ -55,7 +55,7 @@ class ExportCommand extends Command
             ->addArgument('source', InputArgument::REQUIRED, 'Path to source code.')
             ->addArgument('destination', InputArgument::REQUIRED, 'Path to the resulting csv file.')
             ->addOption('ignore', 'i', InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY, "List of regexp path patterns that will be ignored during search (only when `source` argument is directory). Example: --ignore=/^test$/i --ignore=|.*\\.html$|i", [])
-            ->addOption('extensions', 'e', InputOption::VALUE_REQUIRED, "Files that don't have these extensions will be ignored during search (only when `source` argument is directory).")
+            ->addOption('extensions', 'e', InputOption::VALUE_REQUIRED, "Comma-separated list of file extensions. Files that don't have these extensions will be ignored during search (only when `source` argument is directory).  Example: --extensions=php,html")
             ->addOption('fix-word-wrap', 'w', InputOption::VALUE_NONE, "Try to straighten-up word-wrapped comments (and wrap them again properly after editing). Beware, this may break some fancy formatting.");
     }
 

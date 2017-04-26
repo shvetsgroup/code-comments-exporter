@@ -30,7 +30,7 @@ class ImportCommand extends Command
 
     public function __construct($rootDir)
     {
-        parent::__construct('export');
+        parent::__construct('import');
         $this->rootDir = $rootDir;
         $this->sourceFactory = new SourceFactory();
         $this->csv = new CSV();
@@ -39,7 +39,7 @@ class ImportCommand extends Command
     protected function configure()
     {
         $this
-            ->setName('imports')
+            ->setName('import')
             ->setDescription('Imports comments from csv file back to source files.')
             ->addArgument('source', InputArgument::REQUIRED, 'Path to the csv file.')
             ->addArgument('destination', InputArgument::REQUIRED, 'Path to source files.')
