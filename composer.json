@@ -1,5 +1,5 @@
 {
-    "name": "ShvetsGroup/CommentsExporter",
+    "name": "shvetsgroup/comments-exporter",
     "description": "A console script that exports source code comments to csv files and vise versa. Supports most types of comments, both single and multi-line.",
     "keywords": ["framework", "laravel"],
     "license": "MIT",
@@ -11,7 +11,7 @@
     },
     "autoload": {
         "psr-4": {
-            "ShvetsGroup\\": "src/shvetsgroup"
+            "ShvetsGroup\\": "src/ShvetsGroup"
         }
     },
     "autoload-dev": {
