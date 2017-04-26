@@ -14,7 +14,12 @@ Script supports all types of C-like comments, such as:
 
 # Installation
 
-Comments exporter is installed as a global [composer](https://getcomposer.org/doc/00-intro.md) package. You need to have composer installed in your system and have the composer global tools added to [your PATH](https://unix.stackexchange.com/questions/280846/find-composer-global-install-path-as-root.
+**Requirements:**
+
+- PHP7
+- [Composer](https://getcomposer.org/doc/00-intro.md)
+
+Comments exporter is installed as a global Composer package. You need to have Composer installed in your system and have the composer global tools added to [your PATH](https://unix.stackexchange.com/questions/280846/find-composer-global-install-path-as-root).
 
 ```
 composer global require shvetsgroup/comments-exporter
