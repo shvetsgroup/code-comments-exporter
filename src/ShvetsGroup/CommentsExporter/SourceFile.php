@@ -20,8 +20,6 @@ class SourceFile
      */
     private $comments = [];
 
-    private $tokenizedContent;
-
     public function __construct(SplFileInfo $file, Parser $parser)
     {
         $this->file = $file;
@@ -32,11 +30,9 @@ class SourceFile
         return $this->file->getRelativePathname();
     }
 
-    public function addComment($type, $comment): Comment
+    public function addComment($id, $type, $comment)
     {
-        $comment = new Comment(count($this->comments), $type, $comment);
-        $this->comments[] = $comment;
-        return $comment;
+        $this->comments[] = new Comment($id, $type, $comment);
     }
 
     public function getComments()
@@ -49,25 +45,20 @@ class SourceFile
         return $this->file->getContents();
     }
 
-    public function getTokenizedContent()
+    public function setContent(string $content)
     {
-        return $this->tokenizedContent;
+        //file_put_contents($this->file->getPathname(), $content);
     }
 
-    public function setTokenizedContent(string $tokenizedContent)
-    {
-        $this->tokenizedContent = $tokenizedContent;
-    }
-
-    public function saveTokenized()
-    {
-        file_get_contents($this->file->getPathname(), $this->tokenizedContent);
-    }
 
     public function extractComments($options)
     {
-        $result = $this->parser->parse($this->getContent(), $options);
-        $this->setTokenizedContent($result['tokenized']);
-        $this->comments = $result['comments'];
+        $this->comments = $this->parser->parse($this->getContent(), $options);
+    }
+
+    public function updateComments($options)
+    {
+        $content = $this->parser->update($this->getContent(), $this->comments, $options);
+        $this->setContent($content);
     }
 }

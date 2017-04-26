@@ -22,6 +22,8 @@ class ExportCommandTest extends TestCase
     {
         $this->assertEquals(count($expected), count($actual), "File count is wrong.");
         $i = 0;
+        uasort($actual, function($a, $b){ return $a->getRealPath() > $b->getRealPath(); });
+        sort($expected);
         foreach ($actual as $file) {
             $this->assertEquals($basePath . $expected[$i], $file->getRealPath(), "{$i}th file has wrong path.");
             $i++;
@@ -31,13 +33,13 @@ class ExportCommandTest extends TestCase
     public function testExpandSourcesFile()
     {
         $path = $this->path . '/source.php';
-        $result = $this->command->expandSources($path);
+        $result = $this->command->fildAllSourceFiles($path);
         $this->assertPathArrayEquals('', [$path], $result);
     }
 
     public function testExpandSourcesDir()
     {
-        $result = $this->command->expandSources($this->path);
+        $result = $this->command->fildAllSourceFiles($this->path);
         $this->assertPathArrayEquals($this->path, [
             '/source.php',
             '/subdir2/subsource.js',
@@ -49,7 +51,7 @@ class ExportCommandTest extends TestCase
     {
         $this->command->extensions = ['php'];
 
-        $result = $this->command->expandSources($this->path);
+        $result = $this->command->fildAllSourceFiles($this->path);
         $this->assertPathArrayEquals($this->path, [
             '/source.php',
             '/subdir/subsource.php',
@@ -60,7 +62,7 @@ class ExportCommandTest extends TestCase
     {
         $this->command->ignore = ['/php$/i'];
 
-        $result = $this->command->expandSources($this->path);
+        $result = $this->command->fildAllSourceFiles($this->path);
         $this->assertPathArrayEquals($this->path, [
             '/subdir2/subsource.js',
         ], $result);
@@ -71,7 +73,7 @@ class ExportCommandTest extends TestCase
         $this->command->extensions = ['php'];
         $this->command->ignore = ['subdir'];
 
-        $result = $this->command->expandSources($this->path);
+        $result = $this->command->fildAllSourceFiles($this->path);
         $this->assertPathArrayEquals($this->path, [
             '/source.php',
         ], $result);

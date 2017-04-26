@@ -1,5 +1,6 @@
 <?php namespace Tests\Unit\ShvetsGroup\CommentsExporter\Parsers;
 
+use ShvetsGroup\CommentsExporter\Comment;
 use Tests\TestCase;
 use ShvetsGroup\CommentsExporter\Parsers\Parser;
 use ShvetsGroup\CommentsExporter\Parsers\BaseParser;
@@ -32,6 +33,8 @@ class Test {
      *
      */
     function test() {
+        /* Multiline comment wrapped wrapped wrapped wrapped wrapped wrapped
+         * wrapped wrapped wrapped.*/
         /*Asterisk comments.*/
         /*Should stay separate.*/
         a = 1;
@@ -97,39 +100,12 @@ class Test {
      */
 }
 SOURCE;
-        $tokenized = <<<SOURCE
-// ###0###
-class Test {
-    // ###1###
-    function test() {
-        // ###2###
-        // ###3###
-        a = 1;
-        // ###4###
-        b = 2;
-        // ###5###
-        c = 3;
-        // ###6###
-        
-        // ###7###
-        // ###8###
-    }
-    
-    // ###9###
-    private field1;
-    
-    // ###10###
-    private field2;
-    
-    // ###11###
-}
-SOURCE;
 
-        $result = $this->parser->parse($content, ['fix-word-wrap' => true]);
-        $this->assertEquals($tokenized, $result['tokenized']);
+        $comments = $this->parser->parse($content, ['fix-word-wrap' => true]);
         $expected = [
             "Regular doc comment.",
             "Multiple lines needs fixing.\n\nThis should be on new line. Below should be no spacing.",
+            "Multiline comment wrapped wrapped wrapped wrapped wrapped wrapped wrapped wrapped wrapped.",
             "Asterisk comments.",
             "Should stay separate.",
             "Single line comments are ok.",
@@ -141,9 +117,57 @@ SOURCE;
             "How to handle this one?\n\n        ---------\n        |       |\n        ---------\n\nHow about ellipses...\n...like that?",
             "How about code?\n@code\narray(\n  STATE1 => CONDITIONS_ARRAY1,\n  STATE2 => CONDITIONS_ARRAY2,\n  ...\n)\n@endcode\n\n```php\n<?php\n    echo('hi');\n?>\n```"
         ];
-        $this->assertEquals(count($expected), count($result['comments']));
-        for ($i = 0; $i < count($result['comments']); $i++) {
-            $this->assertEquals($expected[$i], $result['comments'][$i]->getComment());
+        $this->assertEquals(count($expected), count($comments));
+        for ($i = 0; $i < count($comments); $i++) {
+            $this->assertEquals($expected[$i], $comments[$i]->getComment());
         }
+    }
+
+    public function testUpdateComplex() {
+        $tokenized = <<<SOURCE
+// ###0###
+class Test {
+    // ###1###
+    function test() {
+        // ###2###
+        // ###3###
+        // ###4###
+        a = 1;
+        // ###5###
+        b = 2;
+    }
+}
+SOURCE;
+
+        $expected = <<<SOURCE
+/**
+ * Regular doc comment.
+ */
+class Test {
+    /**
+     * Indented comment.
+     */
+    function test() {
+        /* Multiline comment wrapped wrapped wrapped wrapped wrapped wrapped
+         * wrapped wrapped wrapped. */
+        /*******/
+        // Simple comment.
+        a = 1;
+        // Simple comment.
+        // In several lines.
+        b = 2;
+    }
+}
+SOURCE;
+        $comments = [
+            new Comment(0, 'doc', "Regular doc comment."),
+            new Comment(1, 'doc', "Indented comment."),
+            new Comment(2, 'multiline', "Multiline comment wrapped wrapped wrapped wrapped wrapped wrapped wrapped wrapped wrapped."),
+            new Comment(3, 'multiline', "*****"),
+            new Comment(4, 'simple', "Simple comment."),
+            new Comment(5, 'simple', "Simple comment.\nIn several lines."),
+        ];
+        $result = $this->parser->update($tokenized, $comments, ['word-wrap-size' => 80, 'tokenized' => $tokenized]);
+        $this->assertEquals($expected, $result);
     }
 }

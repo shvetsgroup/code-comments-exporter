@@ -1,12 +1,13 @@
 <?php namespace ShvetsGroup\CommentsExporter\Commands;
 
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Finder\Finder;
 use ShvetsGroup\CommentsExporter\SourceFactory;
-use ShvetsGroup\CommentsExporter\CSVWriter;
+use ShvetsGroup\CommentsExporter\CSV;
 use Symfony\Component\Finder\SplFileInfo;
 
 /**
@@ -15,12 +16,15 @@ use Symfony\Component\Finder\SplFileInfo;
  * Usage examples:
  * - ./comment export file.php test.csv
  * - ./comment export a-whole-directory test.csv
+ * - ./comment export a-whole-directory test.csv -i /ignored-dir/ -e php,html -w
  */
-class ExportCommand extends BaseCommand
+class ExportCommand extends Command
 {
+    protected $rootDir;
+
     private $sourceFactory;
 
-    private $writer;
+    private $csv;
 
     public $source, $destination;
 
@@ -28,17 +32,16 @@ class ExportCommand extends BaseCommand
 
     public $extensions = [];
 
-    public $rightMargin;
-
     public $fixWordWrap = false;
 
     public $locales = ['en', 'ru'/*, 'uk'*/];
 
     public function __construct($rootDir)
     {
-        parent::__construct($rootDir);
+        parent::__construct('export');
+        $this->rootDir = $rootDir;
         $this->sourceFactory = new SourceFactory();
-        $this->writer = new CSVWriter();
+        $this->csv = new CSV();
     }
 
     /**
@@ -53,28 +56,26 @@ class ExportCommand extends BaseCommand
             ->addArgument('destination', InputArgument::REQUIRED, 'Path to the resulting csv file.')
             ->addOption('ignore', 'i', InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY, "List of regexp path patterns that will be ignored during search (only when `source` argument is directory). Example: --ignore=/^test$/i --ignore=|.*\\.html$|i", [])
             ->addOption('extensions', 'e', InputOption::VALUE_REQUIRED, "Files that don't have these extensions will be ignored during search (only when `source` argument is directory).")
-            ->addOption('right-margin-size', 'r', InputOption::VALUE_REQUIRED, "Size of the right margin where comments will be wrapped. If non passed, comments won't be wrapped.", 0)
             ->addOption('fix-word-wrap', 'w', InputOption::VALUE_NONE, "Try to straighten-up word-wrapped comments (and wrap them again properly after editing). Beware, this may break some fancy formatting.");
     }
 
     /**
      * @param InputInterface $input
      * @param OutputInterface $output
-     * @return null
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $this->parseArguments($input);
 
-        $sources = $this->expandSources($this->source);
+        $files = $this->fildAllSourceFiles($this->source);
 
-        foreach ($sources as $path => $file) {
+        foreach ($files as $path => $file) {
             $source = $this->sourceFactory->make($file);
             $source->extractComments(['fix-word-wrap' => $this->fixWordWrap]);
-            $this->writer->add($source);
+            $this->csv->addSource($source);
         }
 
-        $this->writer->write($this->destination);
+        $this->csv->write($this->destination);
     }
 
     /**
@@ -82,13 +83,12 @@ class ExportCommand extends BaseCommand
      */
     public function parseArguments(InputInterface $input)
     {
-        $this->source = $this->getAbsolutePath($input->getArgument('source'));
-        $this->destination = $this->getAbsolutePath($input->getArgument('destination'), false);
+        $this->source = rtrim($input->getArgument('source'), '\\/');
+        $this->destination = $input->getArgument('destination');
         $this->ignore = array_filter($input->getOption('ignore')) ?: [];
         if ($extensions = $input->getOption('extensions')) {
             $this->extensions = explode(',', $extensions) ?: [];
         }
-        $this->rightMargin = $input->getOption('right-margin-size');
         $this->fixWordWrap = $input->getOption('fix-word-wrap');
     }
 
@@ -96,10 +96,10 @@ class ExportCommand extends BaseCommand
      * @param $sourcePath
      * @return array
      */
-    public function expandSources($sourcePath)
+    public function fildAllSourceFiles($sourcePath)
     {
         if (!is_dir($sourcePath)) {
-            return [$sourcePath => new SplFileInfo($sourcePath, '', '')];
+            return [$sourcePath => new SplFileInfo($sourcePath, dirname($sourcePath), $sourcePath)];
         }
 
         $files = Finder::create()->files();
