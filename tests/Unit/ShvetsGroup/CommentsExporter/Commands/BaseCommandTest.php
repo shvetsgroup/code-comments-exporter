@@ -14,31 +14,31 @@ class BaseCommandTest extends TestCase
 
     public function setUp()
     {
-        $this->command = new BaseCommand($this->rootDir);
+        $this->command = new BaseCommand($this->rootDir . '/data');
     }
 
     public function testGetAbsolutePath()
     {
-        $this->assertEquals($this->rootDir,
+        $this->assertEquals($this->rootDir . '/data',
             $this->command->getAbsolutePath('.'));
-        $this->assertEquals($this->rootDir . '/source.php',
+        $this->assertEquals($this->rootDir . '/data/source.php',
             $this->command->getAbsolutePath('source.php'));
     }
 
     public function testGetAbsolutePathSubdir()
     {
-        $this->assertEquals($this->rootDir . '/subdir',
+        $this->assertEquals($this->rootDir . '/data/subdir',
             $this->command->getAbsolutePath('subdir'));
-        $this->assertEquals($this->rootDir . '/subdir',
+        $this->assertEquals($this->rootDir . '/data/subdir',
             $this->command->getAbsolutePath('subdir/'));
-        $this->assertEquals($this->rootDir . '/subdir/subsource.php',
+        $this->assertEquals($this->rootDir . '/data/subdir/subsource.php',
             $this->command->getAbsolutePath('subdir/subsource.php'));
     }
 
     public function testGetAbsolutePathParentDir()
     {
-        $command = new BaseCommand($this->rootDir . '/subdir');
-        $this->assertEquals($this->rootDir . '/source.php',
+        $command = new BaseCommand($this->rootDir . '/data/subdir');
+        $this->assertEquals($this->rootDir . '/data/source.php',
             $command->getAbsolutePath('../source.php'));
     }
 
@@ -62,7 +62,7 @@ class BaseCommandTest extends TestCase
 
     public function testGetAbsolutePathOptionalExistenceFile()
     {
-        $this->assertEquals($this->rootDir . '/subdir/nonexistent.php',
+        $this->assertEquals($this->rootDir . '/data/subdir/nonexistent.php',
             $this->command->getAbsolutePath('subdir/nonexistent.php', false));
     }
 

@@ -7,6 +7,6 @@ class TestCase extends \PHPUnit\Framework\TestCase
     public function __construct($name = null, array $data = [], $dataName = '')
     {
         parent::__construct($name, $data, $dataName);
-        $this->rootDir = realpath(__DIR__ . '/data');
+        $this->rootDir = realpath(__DIR__);
     }
 }
