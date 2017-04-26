@@ -2,5 +2,5 @@
 
 interface Parser
 {
-    public function parse($content): array;
+    public function parse($content, array $options): array;
 }

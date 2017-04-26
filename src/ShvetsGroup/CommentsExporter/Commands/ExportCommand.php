@@ -10,9 +10,11 @@ use ShvetsGroup\CommentsExporter\CSVWriter;
 use Symfony\Component\Finder\SplFileInfo;
 
 /**
- * ./comment export . test.csv
- * ./comment export ./../ ../test.csv
- * ./comment export ./../test.php ../test.csv
+ * Exports comments from source code to a csv file.
+ *
+ * Usage examples:
+ * - ./comment export file.php test.csv
+ * - ./comment export a-whole-directory test.csv
  */
 class ExportCommand extends BaseCommand
 {
@@ -27,6 +29,8 @@ class ExportCommand extends BaseCommand
     public $extensions = [];
 
     public $rightMargin;
+
+    public $fixWordWrap = false;
 
     public $locales = ['en', 'ru'/*, 'uk'*/];
 
@@ -49,7 +53,8 @@ class ExportCommand extends BaseCommand
             ->addArgument('destination', InputArgument::REQUIRED, 'Path to the resulting csv file.')
             ->addOption('ignore', 'i', InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY, "List of regexp path patterns that will be ignored during search (only when `source` argument is directory). Example: --ignore=/^test$/i --ignore=|.*\\.html$|i", [])
             ->addOption('extensions', 'e', InputOption::VALUE_REQUIRED, "Files that don't have these extensions will be ignored during search (only when `source` argument is directory).")
-            ->addOption('right-margin-size', 'r', InputOption::VALUE_REQUIRED, "Size of the right margin where comments will be wrapped. If non passed, comments won't be wrapped.", 0);
+            ->addOption('right-margin-size', 'r', InputOption::VALUE_REQUIRED, "Size of the right margin where comments will be wrapped. If non passed, comments won't be wrapped.", 0)
+            ->addOption('fix-word-wrap', 'w', InputOption::VALUE_NONE, "Try to straighten-up word-wrapped comments (and wrap them again properly after editing). Beware, this may break some fancy formatting.");
     }
 
     /**
@@ -65,7 +70,7 @@ class ExportCommand extends BaseCommand
 
         foreach ($sources as $path => $file) {
             $source = $this->sourceFactory->make($file);
-            $source->extractComments();
+            $source->extractComments(['fix-word-wrap' => $this->fixWordWrap]);
             $this->writer->add($source);
         }
 
@@ -77,57 +82,14 @@ class ExportCommand extends BaseCommand
      */
     public function parseArguments(InputInterface $input)
     {
-        $this->getSourceArgument($input);
-        $this->getDestinationArgument($input);
-        $this->getIgnoreOption($input);
-        $this->getExtensionsOption($input);
-        $this->getRightMarginOption($input);
-    }
-
-    /**
-     * @param InputInterface $input
-     * @return string
-     */
-    public function getSourceArgument(InputInterface $input)
-    {
         $this->source = $this->getAbsolutePath($input->getArgument('source'));
-        return $this->source;
-    }
-
-    /**
-     * @param InputInterface $input
-     * @return string
-     */
-    public function getDestinationArgument(InputInterface $input)
-    {
         $this->destination = $this->getAbsolutePath($input->getArgument('destination'), false);
-        return $this->destination;
-    }
-
-    /**
-     * @param InputInterface $input
-     */
-    protected function getIgnoreOption(InputInterface $input)
-    {
         $this->ignore = array_filter($input->getOption('ignore')) ?: [];
-    }
-
-    /**
-     * @param InputInterface $input
-     */
-    protected function getExtensionsOption(InputInterface $input)
-    {
         if ($extensions = $input->getOption('extensions')) {
             $this->extensions = explode(',', $extensions) ?: [];
         }
-    }
-
-    /**
-     * @param InputInterface $input
-     */
-    protected function getRightMarginOption(InputInterface $input)
-    {
         $this->rightMargin = $input->getOption('right-margin-size');
+        $this->fixWordWrap = $input->getOption('fix-word-wrap');
     }
 
     /**

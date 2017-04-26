@@ -6,7 +6,8 @@
     "type": "project",
     "require": {
         "symfony/console": "^3.2",
-        "symfony/finder": "^3.2"
+        "symfony/finder": "^3.2",
+        "league/csv": "^8.2"
     },
     "autoload": {
         "psr-4": {

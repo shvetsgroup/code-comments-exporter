@@ -28,6 +28,10 @@ class SourceFile
         $this->parser = $parser;
     }
 
+    public function getPath() {
+        return $this->file->getRelativePathname();
+    }
+
     public function addComment($type, $comment): Comment
     {
         $comment = new Comment(count($this->comments), $type, $comment);
@@ -60,9 +64,9 @@ class SourceFile
         file_get_contents($this->file->getPathname(), $this->tokenizedContent);
     }
 
-    public function extractComments()
+    public function extractComments($options)
     {
-        $result = $this->parser->parse($this->getContent());
+        $result = $this->parser->parse($this->getContent(), $options);
         $this->setTokenizedContent($result['tokenized']);
         $this->comments = $result['comments'];
     }

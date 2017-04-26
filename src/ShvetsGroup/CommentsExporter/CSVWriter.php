@@ -1,7 +1,12 @@
 <?php namespace ShvetsGroup\CommentsExporter;
 
+use League\Csv\Writer;
+
 class CSVWriter
 {
+    /**
+     * @var SourceFile[]
+     */
     private $sources = [];
 
     public function add(SourceFile $source)
@@ -9,24 +14,26 @@ class CSVWriter
         $this->sources[] = $source;
     }
 
-    public function write(string $destination) {
-        $table = [];
+    public function write(string $destination)
+    {
+        $header = ['file', 'id', 'type', 'comment'];
+
+        $records = [];
         foreach ($this->sources as $source) {
             $source->saveTokenized();
-            foreach ($source->getComments() as $example_name => $results) {
-                foreach ($results['comments'] as $comments) {
-                    foreach ($comments as &$comment) {
-                        $comment = preg_replace("#\"#", "\"\"", $comment);
-                        if (preg_match("#\n#", $comment)) {
-                            $comment = '"' . $comment . '"';
-                        }
-                    }
-                    $table[] = $example_name . "\t" . implode("\t", $comments);
-                }
+            foreach ($source->getComments() as $comment) {
+                $records[] = [
+                    $source->getPath(),
+                    $comment->getId(),
+                    $comment->getType(),
+                    $comment->getComment()
+                ];
             }
         }
-        $table = implode("\n", $table);
-        file_put_contents($destination, $table);
 
+        $csv = Writer::createFromString('');
+        $csv->insertOne($header);
+        $csv->insertAll($records);
+        file_put_contents($destination, $csv);
     }
 }

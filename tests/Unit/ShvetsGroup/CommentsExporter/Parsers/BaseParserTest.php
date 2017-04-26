@@ -41,7 +41,7 @@ class Test {
         // should stick together.
         //
         // And respect new lines.
-        // But not here.
+        // Yeap, right.
         c = 3;
         // Although this one.
         
@@ -51,25 +51,50 @@ class Test {
         /*
         *Malformed comments.
         *
-        *    Should fix themselves. 
+        *   Should fix themselves. 
         */
     }
     
     /**
      * @class
      * Don't fix multiple lines here.
-     * @param \$id
+     * - And here.
+     * * And here.
+     * @param \$id Multiline parameter
+     * comment.
      * @param \$type
      */
     private field1;
     
     /**
-     * How to handle this one?
-     *        ---------
-     *        |       |
-     *        ---------
+     * How to handle
+     * this one?
+     *
+     *         ---------
+     *         |       |
+     *         ---------
+     *
+     * How about ellipses...
+     * ...like that?
      */
     private field2;
+    
+    /**
+     * How about code?
+     * @code
+     * array(
+     *   STATE1 => CONDITIONS_ARRAY1,
+     *   STATE2 => CONDITIONS_ARRAY2,
+     *   ...
+     * )
+     * @endcode
+     *
+     * ```php
+     * <?php
+     *     echo('hi');
+     * ?>
+     * ```
+     */
 }
 SOURCE;
         $tokenized = <<<SOURCE
@@ -95,10 +120,12 @@ class Test {
     
     // ###10###
     private field2;
+    
+    // ###11###
 }
 SOURCE;
 
-        $result = $this->parser->parse($content);
+        $result = $this->parser->parse($content, ['fix-word-wrap' => true]);
         $this->assertEquals($tokenized, $result['tokenized']);
         $expected = [
             "Regular doc comment.",
@@ -106,18 +133,17 @@ SOURCE;
             "Asterisk comments.",
             "Should stay separate.",
             "Single line comments are ok.",
-            "Multiple single lines comments should stick together.\n\nAnd respect new lines.\nBut not here.",
+            "Multiple single lines comments should stick together.\n\nAnd respect new lines. Yeap, right.",
             "Although this one.",
             "And this one should remain separate.",
             "Malformed comments.\n\nShould fix themselves.",
-            "@class\nDon't fix multiple lines here.\n@param \$id\n@param \$type",
-            "Malformed comments.\n\nShould fix themselves.",
+            "@class\nDon't fix multiple lines here.\n- And here.\n* And here.\n@param \$id Multiline parameter comment.\n@param \$type",
+            "How to handle this one?\n\n        ---------\n        |       |\n        ---------\n\nHow about ellipses...\n...like that?",
+            "How about code?\n@code\narray(\n  STATE1 => CONDITIONS_ARRAY1,\n  STATE2 => CONDITIONS_ARRAY2,\n  ...\n)\n@endcode\n\n```php\n<?php\n    echo('hi');\n?>\n```"
         ];
         $this->assertEquals(count($expected), count($result['comments']));
         for ($i = 0; $i < count($result['comments']); $i++) {
             $this->assertEquals($expected[$i], $result['comments'][$i]->getComment());
         }
     }
-
-
 }
