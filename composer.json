@@ -11,6 +11,7 @@
     "comments-exporter"
   ],
   "require": {
+    "php": ">=7.0",
     "symfony/console": "^3.2",
     "symfony/finder": "^3.2",
     "league/csv": "^8.2"
